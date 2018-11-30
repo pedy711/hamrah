@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamrah/model/user.dart';
+import 'package:hamrah/util/constants.dart';
 import 'package:hamrah/util/dbhelper.dart';
 
 TextEditingController emailController = TextEditingController();
@@ -7,13 +8,18 @@ TextEditingController passwordController = TextEditingController();
 
 String emailStr = "";
 
-class Home extends StatelessWidget {
+/*class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<User> users = List<User>();
     DbHelper helper = DbHelper();
     helper.initializeDb().then(
-        (result) => helper.getUsers().then((result) => users=result));
+        (result) => helper.getUsers().then((result) => users=result)
+    );
+    
+    if (!users.isEmpty) {
+      users.elementAt(0);
+    }
 
     User user = User("pedram.khoshdani@gmail.com", "123");
     var result = helper.insertUser(user);
@@ -29,7 +35,7 @@ class Home extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Text(
-                      "Email",
+                      Constants.EMAIL_TEXT,
                       style: TextStyle(
                           fontSize: 30.0, decoration: TextDecoration.none),
                       textDirection: TextDirection.rtl,
@@ -40,7 +46,7 @@ class Home extends StatelessWidget {
               ],
             )));
   }
-}
+}*/
 
 class LogoImageWidget extends StatelessWidget {
   @override
@@ -60,8 +66,9 @@ class SubmitBtnWidget extends StatelessWidget {
     var button = Container(
       margin: EdgeInsets.only(top: 25.0),
       child: RaisedButton(
+        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
         child: Text(
-          "Login",
+          Constants.LOGIN_BTN,
           textScaleFactor: 1.5,
         ),
         color: Colors.lightBlue,
@@ -96,51 +103,70 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.title;
+
+
+    var emailTextField = Padding(
+        padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+        child: TextField(
+          controller: emailController,
+          decoration: InputDecoration(
+              labelText: Constants.EMAIL_TEXT,
+              labelStyle: textStyle,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0))),
+          keyboardType: TextInputType.emailAddress,
+          onChanged: (String string) {
+            setState(() {
+              email = string;
+            });
+          },
+        ));
+
+
+    var passwordTextField = Padding(
+        padding: EdgeInsets.only(bottom: 10.0),
+        child: TextField(
+          controller: passwordController,
+          obscureText: true,
+          decoration: InputDecoration(
+              labelText: Constants.PASSWORD_TEXT,
+              labelStyle: textStyle,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0))),
+          keyboardType: TextInputType.text,
+          onChanged: (String string) {
+            setState(() {
+              password = string;
+            });
+          },
+        ));
+
+    final forgotLabel = FlatButton(
+      child: Text(
+        'Forgot password?',
+        style: TextStyle(color: Colors.black54),
+      ),
+      onPressed: () {},
+    );
+
     return new Scaffold(
       backgroundColor: Colors.tealAccent,
-        body: SingleChildScrollView(
-      child: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.all(30.0),
-          child: Column(
-            children: <Widget>[
-              LogoImageWidget(),
-              Padding(
-                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                  child: TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: textStyle,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0))),
-                    keyboardType: TextInputType.emailAddress,
-                    onChanged: (String string) {
-                      setState(() {
-                        email = string;
-                      });
-                    },
-                  )),
-              Padding(
-                  padding: EdgeInsets.only(bottom: 10.0),
-                  child: TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: textStyle,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0))),
-                    keyboardType: TextInputType.text,
-                    onChanged: (String string) {
-                      setState(() {
-                        password = string;
-                      });
-                    },
-                  )),
-              SubmitBtnWidget(),
-            ],
+        body: Center(
+      child: ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.only(left: 24.0, right: 24.0),
+          children: <Widget>[
+            LogoImageWidget(),
+            SizedBox(height: 48.0),
+            emailTextField,
+            SizedBox(height: 8.0),
+            passwordTextField,
+            SizedBox(height: 24.0),
+            SubmitBtnWidget(),
+            forgotLabel
+          ]
+
           )),
-    ));
+    );
   }
 }
