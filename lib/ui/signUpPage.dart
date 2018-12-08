@@ -70,8 +70,7 @@ class _SignUpPage extends State<SignUpPage> {
       padding: EdgeInsets.all(20),
       child: Center(
         child: ListView(children: <Widget>[
-          CustomTextField(emailController, textStyle, Constants.EMAIL_TEXT,
-              TextInputType.emailAddress),
+          createEmailTextField(textStyle),
           buildRaisedButton(false)
         ]),
       ),
@@ -83,15 +82,14 @@ class _SignUpPage extends State<SignUpPage> {
       padding: EdgeInsets.all(20),
       child: Center(
         child: ListView(children: <Widget>[
-          CustomTextField(passwordController, textStyle,
-              Constants.PASSWORD_TEXT, TextInputType.text),
+          createPasswordTextField(textStyle),
           buildRaisedButton(true)
         ]),
       ),
     );
   }
 
-  Padding CustomTextField(controller, textStyle, labelText, keyboardType) {
+/*  Padding CustomTextField(controller, textStyle, labelText, keyboardType) {
     return Padding(
         padding: EdgeInsets.only(top: 50, bottom: 30),
         child: TextField(
@@ -103,6 +101,35 @@ class _SignUpPage extends State<SignUpPage> {
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0))),
           keyboardType: keyboardType,
+        ));
+  }*/
+
+  Padding createEmailTextField(textStyle) {
+    return Padding(
+        padding: EdgeInsets.only(top: 50, bottom: 30),
+        child: TextField(
+          controller: emailController,
+          decoration: InputDecoration(
+              labelText: Constants.EMAIL_TEXT,
+              labelStyle: textStyle,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0))),
+          keyboardType: TextInputType.emailAddress,
+        ));
+  }
+
+  Padding createPasswordTextField(textStyle) {
+    return Padding(
+        padding: EdgeInsets.only(top: 50, bottom: 30),
+        child: TextField(
+          obscureText: true,
+          controller: passwordController,
+          decoration: InputDecoration(
+              labelText: Constants.PASSWORD_TEXT,
+              labelStyle: textStyle,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0))),
+          keyboardType: TextInputType.text,
         ));
   }
 
@@ -134,9 +161,10 @@ class _SignUpPage extends State<SignUpPage> {
 
     if (response.statusCode == 201) {
       // registration accepted: go to next page
-
+      print(response.statusCode);
     } else {
       // user already exists: go to sign in page
+      print(response.statusCode);
     }
   }
 }
