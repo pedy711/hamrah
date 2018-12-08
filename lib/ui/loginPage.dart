@@ -8,89 +8,6 @@ TextEditingController passwordController = TextEditingController();
 
 String emailStr = "";
 
-/*class Home extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    List<User> users = List<User>();
-    DbHelper helper = DbHelper();
-    helper.initializeDb().then(
-        (result) => helper.getUsers().then((result) => users=result)
-    );
-    
-    if (!users.isEmpty) {
-      users.elementAt(0);
-    }
-
-    User user = User("pedram.khoshdani@gmail.com", "123");
-    var result = helper.insertUser(user);
-
-    return Center(
-        child: Container(
-            alignment: Alignment.center,
-            color: Colors.deepPurple,
-            padding: EdgeInsets.all(30.0),
-            child: Column(
-              children: <Widget>[
-                LogoImageWidget(),
-                Row(
-                  children: <Widget>[
-                    Text(
-                      Constants.EMAIL_TEXT,
-                      style: TextStyle(
-                          fontSize: 30.0, decoration: TextDecoration.none),
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ],
-                ),
-                SubmitBtnWidget(),
-              ],
-            )));
-  }
-}*/
-
-class LogoImageWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    AssetImage logoAsset = AssetImage('images/heart.png');
-    Image image = Image(image: logoAsset, width: 200.0, height: 200.0);
-    return Container(
-      child: image,
-      padding: EdgeInsets.all(50.0),
-    );
-  }
-}
-
-class SubmitBtnWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var button = Container(
-      margin: EdgeInsets.only(top: 25.0),
-      child: RaisedButton(
-        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-        child: Text(
-          Constants.LOGIN_BTN,
-          textScaleFactor: 1.5,
-        ),
-        color: Colors.lightBlue,
-        elevation: 5.0,
-        onPressed: () {
-          submit(context);
-        },
-      ),
-    );
-
-    return button;
-  }
-
-  void submit(BuildContext context) {
-    var alert = AlertDialog(
-      title: Text("Submitted"),
-      content: Text("Thanks for visiting us"),
-    );
-    showDialog(context: context, builder: (BuildContext context) => alert);
-  }
-}
-
 class LoginPage extends StatefulWidget {
   @override
   createState() => _LoginPageState();
@@ -104,6 +21,18 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.title;
 
+/*    List<User> users = List<User>();
+    DbHelper helper = DbHelper();
+    helper.initializeDb().then(
+            (result) => helper.getUsers().then((result) => users=result)
+    );
+
+    if (!users.isEmpty) {
+      users.elementAt(0);
+    }
+
+    User user = User("pedram.khoshdani@gmail.com", "123");
+    var result = helper.insertUser(user);*/
 
     var emailTextField = Padding(
         padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -168,5 +97,48 @@ class _LoginPageState extends State<LoginPage> {
 
           )),
     );
+  }
+}
+
+class LogoImageWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    AssetImage logoAsset = AssetImage('images/heart.png');
+    Image image = Image(image: logoAsset, width: 200.0, height: 200.0);
+    return Container(
+      child: image,
+      padding: EdgeInsets.all(50.0),
+    );
+  }
+}
+
+class SubmitBtnWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var button = Container(
+      margin: EdgeInsets.only(top: 25.0),
+      child: RaisedButton(
+        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+        child: Text(
+          Constants.LOGIN_BTN,
+          textScaleFactor: 1.5,
+        ),
+        color: Colors.lightBlue,
+        elevation: 5.0,
+        onPressed: () {
+          submit(context);
+        },
+      ),
+    );
+
+    return button;
+  }
+
+  void submit(BuildContext context) {
+    var alert = AlertDialog(
+      title: Text("Submitted"),
+      content: Text("Thanks for visiting us"),
+    );
+    showDialog(context: context, builder: (BuildContext context) => alert);
   }
 }

@@ -43,7 +43,7 @@ class DbHelper {
 
   Future<int> insertUser(User user) async {
     Database db = await this.db;
-    var result = await db.insert(tblUser, user.toMap());
+    var result = await db.insert(tblUser, user.toJson());
     return result;
   }
   
@@ -63,7 +63,7 @@ class DbHelper {
   
   Future<int> updateUser(User user) async {
     var db = await this.db;
-    var result = await db.update(tblUser, user.toMap(),
+    var result = await db.update(tblUser, user.toJson(),
       where: "$colId = ?", whereArgs: [user.id]);
     return result;
   }

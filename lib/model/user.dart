@@ -1,12 +1,22 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user.g.dart';
+
+@JsonSerializable()
 class User{
-  int _id;
-  String _email;
-  String _password;
+  @JsonKey(includeIfNull: false)
+  int id;
+  final String email;
+  final String password;
 
-  User (this._email, this._password);
-  User.withId (this._id, this._email, this._password);
+  User (this.email, this.password);
+  User.withId (this.id, this.email, this.password);
 
-  int get id => _id; // fat operator '=>' means return
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+
+/*  int get id => _id; // fat operator '=>' means return
   String get email => _email;
   String get password => _password;
 
@@ -16,9 +26,12 @@ class User{
 
   set password (String password) {
     _password = password;
-  }
+  }*/
 
-  Map <String, dynamic> toMap() {
+/*  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserToJson(this);*/
+  /*Map <String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     map["email"] = _email;
     map["password"] = _password;
@@ -33,6 +46,6 @@ class User{
     this._id = o["id"];
     this._email = o["email"];
     this._password = o["password"];
-  }
+  }*/
 
 }

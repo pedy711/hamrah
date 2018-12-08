@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamrah/ui/loginPage.dart';
+import 'package:hamrah/ui/signUpPage.dart';
 import 'package:hamrah/util/constants.dart';
 
 class HomePage extends StatelessWidget {
@@ -11,12 +12,13 @@ class HomePage extends StatelessWidget {
             color: Colors.tealAccent,
             child: Column(
               children: <Widget>[
+                LogoImageWidget(),
                 Padding(
-                  padding: EdgeInsets.only(top: 300.0, bottom: 100.0),
+                  padding: EdgeInsets.only(top: 20.0, bottom: 50.0),
                   child: Text(Constants.APP_NAME_PERSIAN,
                       textScaleFactor: 1.5,
                       style: TextStyle(
-                          fontSize: 30.0, decoration: TextDecoration.none)),
+                          fontSize: 40.0, decoration: TextDecoration.none, color: Colors.blueAccent)),
                 ),
                 RaisedButton(
                     shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
@@ -29,7 +31,7 @@ class HomePage extends StatelessWidget {
                     ),
                     textColor: Colors.white,
                     color: Colors.blueAccent,
-                    onPressed: () => navigateToLoginPage(context)),
+                    onPressed: () => navigateToSignUpPage(context)),
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 ),
@@ -52,5 +54,22 @@ class HomePage extends StatelessWidget {
   void navigateToLoginPage(BuildContext context) async {
     bool result = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginPage()));
+  }
+
+  void navigateToSignUpPage(BuildContext context) async {
+    bool result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SignUpPage()));
+  }
+}
+
+class LogoImageWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    AssetImage logoAsset = AssetImage('images/heart.png');
+    Image image = Image(image: logoAsset, width: 200.0, height: 200.0);
+    return Container(
+      child: image,
+      padding: EdgeInsets.all(50.0),
+    );
   }
 }
