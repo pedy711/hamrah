@@ -14,6 +14,7 @@ class Constants{
   static final String BECOME_A_MEMBER = "عضوم کن 🐣";
   static final String EMAIL_TEXT = "ایمیل";
   static final String PASSWORD_TEXT = "کلمه عبور";
+  static final String REPEAT_PASSWORD_TEXT = "تکرار کلمه عبور";
   static final String LOGIN_BTN = "ورود";
   static final String ALREADY_A_MEMBER_TEXT = "عضو هستم 🤠";
   static final String NEXT_TEXT = "بعدی";
