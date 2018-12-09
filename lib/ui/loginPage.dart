@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamrah/model/user.dart';
+import 'package:hamrah/ui/introductionPage.dart';
 import 'package:hamrah/util/constants.dart';
 import 'package:hamrah/util/dbhelper.dart';
 
@@ -135,10 +136,16 @@ class SubmitBtnWidget extends StatelessWidget {
   }
 
   void submit(BuildContext context) {
-    var alert = AlertDialog(
+    navigateToIntroductionPage(context);
+    /*var alert = AlertDialog(
       title: Text("Submitted"),
       content: Text("Thanks for visiting us"),
     );
-    showDialog(context: context, builder: (BuildContext context) => alert);
+    showDialog(context: context, builder: (BuildContext context) => alert);*/
+  }
+
+  void navigateToIntroductionPage(BuildContext context) async {
+    bool result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => IntroductionPage()));
   }
 }

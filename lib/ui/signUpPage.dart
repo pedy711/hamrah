@@ -14,6 +14,7 @@ TextEditingController repeatPasswordController = TextEditingController();
 TextEditingController signUpController = TextEditingController();
 String btnText = Constants.NEXT_TEXT;
 const jasonCodec = const JsonCodec();
+BuildContext _context;
 
 PageController _pageController = PageController();
 PageView _pageView = PageView();
@@ -27,11 +28,10 @@ class _SignUpPage extends State<SignUpPage> {
 //  CarouselSlider carouselSlider;
   String nextBtnText = Constants.NEXT_TEXT;
   final GlobalKey<FormState> _formEmailKey    = new GlobalKey<FormState>();
-  final GlobalKey<FormState> _formPasswordKey = new GlobalKey<FormState>();
-
 
   @override
   Widget build(BuildContext context) {
+    _context = context;
     TextStyle textStyle = Theme
         .of(context)
         .textTheme
@@ -232,6 +232,12 @@ class _SignUpPage extends State<SignUpPage> {
     } else {
       // user already exists: go to sign in page
       print(response.statusCode);
+      navigateToLoginPage();
     }
+  }
+
+  void navigateToLoginPage() async {
+    bool result = await Navigator.push(
+        _context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 }

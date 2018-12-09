@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamrah/ui/introductionPage.dart';
 import './ui/homePage.dart';
 
 void main() => runApp(new MyApp());
@@ -10,6 +11,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: new HomePage());
+      home: new IntroductionPage());
   }
 }
