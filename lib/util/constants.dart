@@ -19,10 +19,26 @@ class Constants{
   static final String NEXT_TEXT = "بعدی";
   static final String SIGN_UP = "ثبت نام";
   static final String SELF_SUMMARY_TITLE_TEXT = "راجع به خودت بگو";
-  static final String SELF_SUMMARY_TEXT = "که ما بتونیم افرادی که دوست دارید برای شما پیدا کنیم.";
+  static final String SELF_SUMMARY_TEXT = "که ما بتونیم افرادی که دوست داری برات پیدا کنیم.";
   static final String FIRST_NAME_TEXT = "نام کوچک";
   static final String LAST_NAMENAME_TEXT = "نام خانوادگی";
   static final String ABOUT_YOU_TEXT = "درباره تو";
+
+  // Introduction Page
+  static final String FEMALE = "زن                                                          👩";
+  static final String MALE = "مرد                                                         🧑";
+/*  static final String FEMALE = "زن 👩";
+  static final String MALE = "مرد 🧑";*/
+  static final String BIRTHDAY = "روز تولد";
+  static final String OK = "تائید";
+  static final String CANCEL = "انصراف";
+
+
+
+
+  // Development
+  static final String GET_ALL_USERS = "/user/all";
+
 
 
 
