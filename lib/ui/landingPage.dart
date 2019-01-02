@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamrah/ui/cardsPage.dart';
+import 'package:hamrah/util/constants.dart';
 
 BuildContext _context;
 
@@ -13,9 +14,14 @@ class _LandingPage extends State<LandingPage> {
   Widget build(BuildContext context) {
     _context = context;
     return Scaffold(
-      backgroundColor: Colors.orange,
-      body: Center(child: RaisedButton(onPressed: navigateToLoginPage),)
-    );
+        backgroundColor: Colors.orange,
+        body: Center(
+          child: RaisedButton(
+              child: Text(Constants.GET_STARTED_BTN,
+                  textScaleFactor: 1.5,
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              onPressed: navigateToLoginPage),
+        ));
   }
 
   void navigateToLoginPage() async {

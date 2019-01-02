@@ -5,12 +5,17 @@ part 'user.g.dart';
 @JsonSerializable()
 class User{
   @JsonKey(includeIfNull: false)
-  int id;
-  final String email;
-  final String password;
+  int           id;
+  String        firstName;
+  String        lastName;
+  final String  email;
+  final String  password;
+  bool          enabled;
+  int           age;
 
-  User (this.email, this.password);
-  User.withId (this.id, this.email, this.password);
+  User (this.firstName, this.lastName, this.email, this.password, this.enabled, this.age);
+  User.withId (this.id, this.firstName, this.lastName, this.email, this.password, this.enabled, this.age);
+  User.withEmailPassword (this.email, this.password);
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

@@ -1,8 +1,9 @@
 class Constants{
   // Server endpoints
-  static final String SERVER_IP = "10.0.2.2";
+//  static final String SERVER_IP = "10.0.2.2";
+  static final String SERVER_IP = "hamrah.herokuapp.com";
   static final int    SERVER_PORT = 8091;
-  static final String SERVER_URL = SERVER_IP + ":" + SERVER_PORT.toString();
+  static final String SERVER_URL = SERVER_IP /*+ ":" + SERVER_PORT.toString()*/;
   static final String REGISTER_USER = "/user";
 
 
@@ -32,6 +33,10 @@ class Constants{
   static final String BIRTHDAY = "روز تولد";
   static final String OK = "تائید";
   static final String CANCEL = "انصراف";
+  static final String WHERE_DO_YOU_LIVE = "کجا زندگی می کنی؟";
+  static final String AUTOMATIC_LOCATION = "موقعیت مکانی خودت رو به صورت خودکار پر کن";
+  static final String ACTIVATE = "فعال کن";
+
 
 
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hamrah/ui/cardsPage.dart';
 import 'package:hamrah/ui/introductionPage.dart';
+import 'package:hamrah/ui/landingPage.dart';
 import './ui/homePage.dart';
 
 void main() => runApp(new MyApp());
@@ -13,5 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
 //        home: new HomePage());
       home: new IntroductionPage());
+//    home: new LandingPage());
+
   }
 }

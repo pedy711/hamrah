@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hamrah/ui/landingPage.dart';
 import 'package:hamrah/util/constants.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
+import 'package:location/location.dart';
+import 'package:flutter/services.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 
 BuildContext _context;
 
@@ -19,6 +24,28 @@ class _IntroductionPage extends State<IntroductionPage> {
   int _genderSelection = -1;
   final dateFormat = intl.DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime date;
+  Map<String, double> _startLocation;
+  Map<String, double> _currentLocation;
+  StreamSubscription<Map<String, double>> _locationSubscription;
+  Location _location = new Location();
+  bool _permission = false;
+  String error;
+  String _country;
+
+  @override
+  void initState() {
+    super.initState();
+
+//    initPlatformState();
+
+/*    _locationSubscription =
+        _location.onLocationChanged().listen((Map<String,double> result) {
+          setState(() {
+            _currentLocation = result;
+            print(result);
+          });
+        });*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +56,7 @@ class _IntroductionPage extends State<IntroductionPage> {
       createFirstNamePage(),
       createGenderPage(),
       createBirthdayPage(),
+      createLocationPage(),
     ], controller: _pageController);
 
     return new Scaffold(
@@ -157,7 +185,6 @@ class _IntroductionPage extends State<IntroductionPage> {
   }
 
   // ------------------------------------------[ Gender Page]------------------------------------------------
-
   Widget createGenderPage() {
     return Padding(
       padding: EdgeInsets.all(20),
@@ -261,46 +288,46 @@ class _IntroductionPage extends State<IntroductionPage> {
 
   Column createBirthdayDatePicker() {
     return Column(
-          children: <Widget>[
-            Text(
-              Constants.BIRTHDAY,
-              textDirection: TextDirection.rtl,
-              textScaleFactor: 1.5,
-              style: TextStyle(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10, bottom: 50),
-              child: RaisedButton(
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                onPressed: _showDatePicker,
-                child: Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '$_datetime',
-                        textScaleFactor: 1.5,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        Icons.date_range,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+      children: <Widget>[
+        Text(
+          Constants.BIRTHDAY,
+          textDirection: TextDirection.rtl,
+          textScaleFactor: 1.5,
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 50),
+          child: RaisedButton(
+            shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(30.0)),
+            onPressed: _showDatePicker,
+            child: Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '$_datetime',
+                    textScaleFactor: 1.5,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                textColor: Colors.white,
-                color: Colors.blue,
-              ),
-            )
-          ],
-        );
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Icon(
+                    Icons.date_range,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            textColor: Colors.white,
+            color: Colors.blue,
+          ),
+        )
+      ],
+    );
   }
 
   String _datetime = '';
@@ -368,7 +395,8 @@ class _IntroductionPage extends State<IntroductionPage> {
       ),
       textColor: Colors.white,
       color: Colors.blueAccent,
-      onPressed: _birthdayPageBtnActivated ? () => navigateToLandingPage() : null,
+      onPressed:
+          _birthdayPageBtnActivated ? () => navigateToLandingPage() : null,
 //          submit();
     );
   }
@@ -376,5 +404,159 @@ class _IntroductionPage extends State<IntroductionPage> {
   void navigateToLandingPage() async {
     bool result = await Navigator.push(
         _context, MaterialPageRoute(builder: (context) => LandingPage()));
+  }
+
+// ------------------------------------------[ Location Page]------------------------------------------------
+  bool _locationPageBtnActivated = false;
+  bool _defaultLocationCard = true;
+
+  Widget createLocationPage() {
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: Center(
+        child: ListView(children: <Widget>[
+          Text(
+            Constants.ABOUT_YOU_TEXT,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textDirection: TextDirection.rtl,
+          ),
+          Text(
+            Constants.WHERE_DO_YOU_LIVE,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            textDirection: TextDirection.rtl,
+          ),
+          _defaultLocationCard ? createLocationCard() : createLocationForm(),
+          Padding(padding: EdgeInsets.only(bottom: 30)),
+          buildRaisedButtonLocationNextPage()
+        ]),
+      ),
+    );
+  }
+
+  Column createLocationCard() {
+    return Column(
+      children: <Widget>[
+        Padding(
+            padding: EdgeInsets.only(top: 40, bottom: 50),
+            child: Card(
+                child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    Constants.AUTOMATIC_LOCATION,
+                    textAlign: TextAlign.center,
+                    textDirection: TextDirection.rtl,
+                  ),
+                  Padding(padding: EdgeInsets.all(30)),
+                  enableLocationServicesBtn(),
+                  Padding(padding: EdgeInsets.all(5)),
+                  InkWell(
+                    child: Text(
+                      "No Thanks",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onTap: () => setState(() {
+                      _defaultLocationCard = false;
+                      _locationPageBtnActivated = true;
+                    }),
+                  )
+                ],
+              ),
+            )))
+      ],
+    );
+  }
+
+  Widget createLocationForm() {
+    return CountryCodePicker(
+      onChanged: (countryCode) => _onCountryChange(countryCode),
+      // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+      initialSelection: 'IR',
+      favorite: ['+98','IR'],
+    );
+  }
+
+  _onCountryChange(CountryCode countryCode) {
+    _country = countryCode.name;
+  /*  setState(() {
+      _locationPageBtnActivated = true;
+    });*/
+    print("New Country selected: " + countryCode.toString());
+  }
+
+  RaisedButton buildRaisedButtonLocationNextPage() {
+    return RaisedButton(
+      shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(2.0)),
+      padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
+      child: Text(
+        Constants.NEXT_TEXT,
+        textScaleFactor: 1.5,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      textColor: Colors.white,
+      color: Colors.blueAccent,
+      onPressed: _locationPageBtnActivated ? () => nextPage() : null,
+//          submit();
+    );
+  }
+
+  RaisedButton enableLocationServicesBtn() {
+    return RaisedButton(
+      shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(2.0)),
+      padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
+      child: Padding(
+        padding: EdgeInsets.only(left: 80, right: 80),
+        child: Text(
+          Constants.ACTIVATE,
+          textScaleFactor: 1.2,
+        ),
+      ),
+      textColor: Colors.white,
+      color: Colors.blueAccent,
+      onPressed: () => initPlatformState(),
+//          submit();
+    );
+  }
+
+  initPlatformState() async {
+    Map<String, double> location;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+/**/
+    try {
+      _permission = await _location.hasPermission();
+      location = await _location.getLocation();
+      error = null;
+    } on PlatformException catch (e) {
+      if (e.code == 'PERMISSION_DENIED') {
+        error = 'Permission denied';
+      } else if (e.code == 'PERMISSION_DENIED_NEVER_ASK') {
+        error =
+            'Permission denied - please ask the user to enable it from the app settings';
+      }
+
+      location = null;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    //if (!mounted) return;
+
+    setState(() {
+      _startLocation = location;
+    });
+
+    _locationSubscription =
+        _location.onLocationChanged().listen((Map<String, double> result) {
+      setState(() {
+        _locationPageBtnActivated = true;
+        _currentLocation = result;
+      });
+    });
   }
 }

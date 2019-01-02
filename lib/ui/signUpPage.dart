@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamrah/model/user.dart';
+import 'package:hamrah/ui/introductionPage.dart';
 
 //import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hamrah/ui/loginPage.dart';
@@ -212,7 +213,7 @@ class _SignUpPage extends State<SignUpPage> {
   }
 
   Future<String> registerUser() async {
-    User user = new User(emailController.text, passwordController.text);
+    User user = new User.withEmailPassword(emailController.text, passwordController.text);
     Uri uri = Uri.http(Constants.SERVER_URL, Constants.REGISTER_USER);
     String str = json.encode(user);
     print(str);
@@ -227,17 +228,17 @@ class _SignUpPage extends State<SignUpPage> {
     );
 
     if (response.statusCode == 201) {
-      // registration accepted: go to next page
-      print(response.statusCode);
+      // registration accepted: go to next
+      navigateIntroductionPage(IntroductionPage());
     } else {
       // user already exists: go to sign in page
       print(response.statusCode);
-      navigateToLoginPage();
+      navigateIntroductionPage(LoginPage());
     }
   }
 
-  void navigateToLoginPage() async {
+  void navigateIntroductionPage(Widget page) async {
     bool result = await Navigator.push(
-        _context, MaterialPageRoute(builder: (context) => LoginPage()));
+        _context, MaterialPageRoute(builder: (context) => page));
   }
 }
