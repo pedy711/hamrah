@@ -36,6 +36,7 @@ class Constants{
   static final String WHERE_DO_YOU_LIVE = "کجا زندگی می کنی؟";
   static final String AUTOMATIC_LOCATION = "موقعیت مکانی خودت رو به صورت خودکار پر کن";
   static final String ACTIVATE = "فعال کن";
+  static final String ADD_SOME_GREAT_PHOTOS = "چند تا عکس عالی اضافه کن";
 
 
 

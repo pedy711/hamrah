@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hamrah/ui/landingPage.dart';
@@ -8,6 +9,10 @@ import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as Img;
+import 'dart:math' as Math;
 
 BuildContext _context;
 
@@ -31,6 +36,7 @@ class _IntroductionPage extends State<IntroductionPage> {
   bool _permission = false;
   String error;
   String _country;
+  List<File> _imageArr;
 
   @override
   void initState() {
@@ -57,6 +63,7 @@ class _IntroductionPage extends State<IntroductionPage> {
       createGenderPage(),
       createBirthdayPage(),
       createLocationPage(),
+      createPhotoUploadPage(),
     ], controller: _pageController);
 
     return new Scaffold(
@@ -459,9 +466,9 @@ class _IntroductionPage extends State<IntroductionPage> {
                       style: TextStyle(color: Colors.blue),
                     ),
                     onTap: () => setState(() {
-                      _defaultLocationCard = false;
-                      _locationPageBtnActivated = true;
-                    }),
+                          _defaultLocationCard = false;
+                          _locationPageBtnActivated = true;
+                        }),
                   )
                 ],
               ),
@@ -475,13 +482,13 @@ class _IntroductionPage extends State<IntroductionPage> {
       onChanged: (countryCode) => _onCountryChange(countryCode),
       // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
       initialSelection: 'IR',
-      favorite: ['+98','IR'],
+      favorite: ['+98', 'IR'],
     );
   }
 
   _onCountryChange(CountryCode countryCode) {
     _country = countryCode.name;
-  /*  setState(() {
+    /*  setState(() {
       _locationPageBtnActivated = true;
     });*/
     print("New Country selected: " + countryCode.toString());
@@ -559,4 +566,167 @@ class _IntroductionPage extends State<IntroductionPage> {
       });
     });
   }
+
+// ------------------------------------------[ Photo Upload Page]------------------------------------------------
+  bool _photoUploadPageBtnAcivatedt = false;
+
+  Widget createPhotoUploadPage() {
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: Center(
+        child: Column(children: <Widget>[
+          Text(
+            Constants.ABOUT_YOU_TEXT,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textDirection: TextDirection.rtl,
+          ),
+          Text(
+            Constants.ADD_SOME_GREAT_PHOTOS,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            textDirection: TextDirection.rtl,
+          ),
+          new Expanded(child: buildGridView()),
+          /*_imageArr == null
+              ? new Text('No image selected.')
+              : new Image.file(_imageArr.elementAt(0)),
+          Padding(padding: EdgeInsets.only(bottom: 30)),
+          new FloatingActionButton(
+            onPressed: getImage,
+            tooltip: 'Pick Image',
+            child: new Icon(Icons.add_a_photo),
+          ),*/
+          buildRaisedButtonLocationNextPage()
+        ]),
+      ),
+    );
+  }
+
+  Future getImage() async {
+    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (_imageArr == null) {
+        _imageArr = new List<File>();
+      }
+      if (image != null) {
+        _imageArr.add(image);
+      }
+    });
+  }
+
+  bool notNull(Object o) => o != null;
+
+  Card makeGridCell(IconData icon, int imgNum) {
+    Widget imgOrTextWidget = createImgWidget(imgNum);
+    return Card(
+      elevation: 1.0,
+      child: Column(
+        children: <Widget>[
+          imgOrTextWidget,
+          imgOrTextWidget == null
+              ? new FloatingActionButton(
+                  onPressed: getImage,
+                  tooltip: 'Pick Image',
+                  child: new Icon(Icons.add_a_photo),
+                )
+              : null
+        ].where(notNull).toList(),
+        mainAxisAlignment: MainAxisAlignment.center,
+      ),
+    );
+  }
+
+  Image createImgWidget(int imgNum) {
+    return _imageArr != null && _imageArr.length > imgNum
+        ? new Image.file(
+            _imageArr.elementAt(imgNum),
+            height: 175,
+          )
+        : null;
+  }
+
+  GridView buildGridView() {
+    return GridView.count(
+        primary: true,
+        padding: EdgeInsets.all(1.0),
+        crossAxisCount: 2,
+        childAspectRatio: 1.0,
+        mainAxisSpacing: 1.0,
+        crossAxisSpacing: 1.0,
+        children: <Widget>[
+          makeGridCell(Icons.add_a_photo, 0),
+          makeGridCell(Icons.add_a_photo, 1),
+          makeGridCell(Icons.add_a_photo, 2),
+          makeGridCell(Icons.add_a_photo, 3),
+          makeGridCell(Icons.add_a_photo, 4),
+          makeGridCell(Icons.add_a_photo, 5),
+        ]);
+  }
+
+  Future getImageCamera() async {
+    var imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+
+    int rand = new Math.Random().nextInt(100000);
+
+    Img.Image image = Img.decodeImage(imageFile.readAsBytesSync());
+    Img.Image smallerImg = Img.copyResize(image, 500);
+
+    var compressImg = new File("$path/image_$rand.jpg")
+      ..writeAsBytesSync(Img.encodeJpg(smallerImg, quality: 85));
+
+    setState(() {
+      _imageArr.add(compressImg);
+    });
+  }
+
+  Future getImageGallery() async {
+    var imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+
+    int rand = new Math.Random().nextInt(100000);
+
+    Img.Image image = Img.decodeImage(imageFile.readAsBytesSync());
+    Img.Image smallerImg = Img.copyResize(image, 500);
+
+    var compressImg = new File("$path/image_$rand.jpg")
+      ..writeAsBytesSync(Img.encodeJpg(smallerImg, quality: 85));
+
+    setState(() {
+      _imageArr.add(compressImg);
+    });
+  }
 }
+
+/*class TheGridView {
+  Card makeGridCell(IconData icon) {
+    return Card(
+      elevation: 1.0,
+      child: Center(child: Icon(icon, size: 30.0,)),
+    );
+  }
+
+  GridView build() {
+    return GridView.count(
+        primary: true,
+        padding: EdgeInsets.all(1.0),
+        crossAxisCount: 2,
+        childAspectRatio: 1.0,
+        mainAxisSpacing: 1.0,
+        crossAxisSpacing: 1.0,
+        children: <Widget>[
+          makeGridCell(Icons.add_a_photo),
+          makeGridCell(Icons.add_a_photo),
+          makeGridCell(Icons.add_a_photo),
+          makeGridCell(Icons.add_a_photo),
+          makeGridCell(Icons.add_a_photo),
+          makeGridCell(Icons.add_a_photo),
+        ]);
+  }
+}*/
