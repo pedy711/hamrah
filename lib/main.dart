@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
 //        home: new HomePage());
-      home: new IntroductionPage());
-//    home: new LandingPage());
+//      home: new IntroductionPage());
+    home: new LandingPage());
 
   }
 }

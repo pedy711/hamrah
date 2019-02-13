@@ -5,7 +5,9 @@ import 'package:hamrah/ui/introductionPage.dart';
 //import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hamrah/ui/loginPage.dart';
 import 'package:hamrah/util/constants.dart';
+import 'package:hamrah/util/httphelper.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:validate/validate.dart';
 
@@ -28,15 +30,16 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPage extends State<SignUpPage> {
 //  CarouselSlider carouselSlider;
   String nextBtnText = Constants.NEXT_TEXT;
-  final GlobalKey<FormState> _formEmailKey    = new GlobalKey<FormState>();
+  final GlobalKey<FormState> _formEmailKey = new GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    emailController.text = "pedram.khoshdani@gmail.com";
+    passwordController.text = "12345678";
+    repeatPasswordController.text = "12345678";
+
     _context = context;
-    TextStyle textStyle = Theme
-        .of(context)
-        .textTheme
-        .title;
+    TextStyle textStyle = Theme.of(context).textTheme.title;
 
     _pageView = new PageView(
       children: <Widget>[createSignUpForm(textStyle)],
@@ -56,13 +59,12 @@ class _SignUpPage extends State<SignUpPage> {
 
       registerUser().then((response) => print("Response body: " + response));
 
-
       print('Printing the login data.');
       print('Email: ${emailController.text}');
       print('Password: ${passwordController.text}');
     }
 
-   /* if (this._formPasswordKey.currentState.validate()){
+    /* if (this._formPasswordKey.currentState.validate()){
       _formPasswordKey.currentState.save(); // Save our form now.
 
       registerUser().then((response) => print("Response body: " + response));
@@ -74,7 +76,7 @@ class _SignUpPage extends State<SignUpPage> {
         shape: new RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(30.0)),
         padding:
-        EdgeInsets.only(left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
+            EdgeInsets.only(left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
         child: Text(
           btnText = Constants.SIGN_UP,
           textScaleFactor: 1.5,
@@ -100,7 +102,7 @@ class _SignUpPage extends State<SignUpPage> {
         child: ListView(children: <Widget>[
           createEmailTextFormField(textStyle),
           createPasswordTextFormField(textStyle),
-          createRepeatPasswordTextFormField (textStyle),
+          createRepeatPasswordTextFormField(textStyle),
           buildRaisedButton()
         ]),
       ),
@@ -202,10 +204,10 @@ class _SignUpPage extends State<SignUpPage> {
 
   // Add validate email function.
   String _validateEmail(String value) {
-    try{
+    try {
       Validate.isEmail(value);
 //      TODO: make a call to see if this email address already exists
-    } catch (e){
+    } catch (e) {
       return 'The E-mail address must be a valid email address.';
     }
 
@@ -213,31 +215,24 @@ class _SignUpPage extends State<SignUpPage> {
   }
 
   Future<String> registerUser() async {
-    User user = new User.withEmailPassword(emailController.text, passwordController.text);
-    Uri uri = Uri.http(Constants.SERVER_URL, Constants.REGISTER_USER);
-    String str = json.encode(user);
-    print(str);
+    User user = new User.withEmailPassword(
+        emailController.text, passwordController.text);
 
-    http.Response response = await http.post(
-        uri,
-        body: json.encode(user.toJson()),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        }
-    );
-
-    if (response.statusCode == 201) {
-      // registration accepted: go to next
-      navigateIntroductionPage(IntroductionPage());
-    } else {
-      // user already exists: go to sign in page
-      print(response.statusCode);
-      navigateIntroductionPage(LoginPage());
-    }
+    HttpHelper http = HttpHelper();
+    http.post(json.encode(user.toJson()), Constants.REGISTER_USER)
+        .then((response) {
+      if (response.statusCode == 201) {
+        // registration accepted: go to next
+        navigateToPage(IntroductionPage());
+      } else {
+        // user already exists: go to sign in page
+        print(response.statusCode);
+        navigateToPage(LoginPage());
+      }
+    });
   }
 
-  void navigateIntroductionPage(Widget page) async {
+  void navigateToPage(Widget page) async {
     bool result = await Navigator.push(
         _context, MaterialPageRoute(builder: (context) => page));
   }

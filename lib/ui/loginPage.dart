@@ -22,18 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.title;
 
-/*    List<User> users = List<User>();
-    DbHelper helper = DbHelper();
-    helper.initializeDb().then(
-            (result) => helper.getUsers().then((result) => users=result)
-    );
-
-    if (!users.isEmpty) {
-      users.elementAt(0);
-    }
-
-    User user = User("pedram.khoshdani@gmail.com", "123");
-    var result = helper.insertUser(user);*/
+    emailController.text = "pedram.khoshdani@gmail.com";
+    passwordController.text = "12345678";
 
     var emailTextField = Padding(
         padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -136,6 +126,8 @@ class SubmitBtnWidget extends StatelessWidget {
   }
 
   void submit(BuildContext context) {
+    // try to login the user
+
     navigateToIntroductionPage(context);
     /*var alert = AlertDialog(
       title: Text("Submitted"),

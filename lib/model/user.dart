@@ -1,3 +1,4 @@
+import 'package:hamrah/model/basic/customLocation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
@@ -5,15 +6,28 @@ part 'user.g.dart';
 @JsonSerializable()
 class User{
   @JsonKey(includeIfNull: false)
-  int           id;
-  String        firstName;
-  String        lastName;
-  final String  email;
-  final String  password;
-  bool          enabled;
-  int           age;
+  int               id;
+  String            firstName;
+  String            lastName;
+  int               gender;   // male = 1, female = 0
+  String            email;
+  String            password;
+  bool              enabled;
+  int               age;
+  CustomLocation    location;
+  DateTime          birthday;
+  String            summary;
 
-  User (this.firstName, this.lastName, this.email, this.password, this.enabled, this.age);
+  static final User _user = User._internal();
+
+  User._internal();
+
+  factory User(){
+    return _user;
+  }
+
+
+  User.withAll (this.firstName, this.lastName, this.email, this.password, this.enabled, this.age, this.birthday);
   User.withId (this.id, this.firstName, this.lastName, this.email, this.password, this.enabled, this.age);
   User.withEmailPassword (this.email, this.password);
 

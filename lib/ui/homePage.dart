@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hamrah/model/user.dart';
 import 'package:hamrah/ui/loginPage.dart';
 import 'package:hamrah/ui/signUpPage.dart';
 import 'package:hamrah/util/constants.dart';
+import 'package:hamrah/util/dbhelper.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -18,10 +20,13 @@ class HomePage extends StatelessWidget {
                   child: Text(Constants.APP_NAME_PERSIAN,
                       textScaleFactor: 1.5,
                       style: TextStyle(
-                          fontSize: 40.0, decoration: TextDecoration.none, color: Colors.blueAccent)),
+                          fontSize: 40.0,
+                          decoration: TextDecoration.none,
+                          color: Colors.blueAccent)),
                 ),
                 RaisedButton(
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
                     padding: EdgeInsets.only(
                         left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
                     child: Text(
@@ -36,7 +41,8 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 ),
                 RaisedButton(
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
                     padding: EdgeInsets.only(
                         left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
                     child: Text(

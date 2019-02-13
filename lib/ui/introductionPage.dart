@@ -1,8 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hamrah/model/basic/customLocation.dart';
+import 'package:hamrah/model/communication/dataSourceResponse.dart';
+import 'package:hamrah/model/communication/dsRequest.dart';
+import 'package:hamrah/model/user.dart';
 import 'package:hamrah/ui/landingPage.dart';
+import 'package:hamrah/ui/loginPage.dart';
 import 'package:hamrah/util/constants.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
@@ -13,8 +19,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as Img;
 import 'dart:math' as Math;
+import 'package:http/http.dart' as http;
+
 
 BuildContext _context;
+const jasonCodec = const JsonCodec();
 
 class IntroductionPage extends StatefulWidget {
   @override
@@ -37,6 +46,8 @@ class _IntroductionPage extends State<IntroductionPage> {
   String error;
   String _country;
   List<File> _imageArr;
+  TextEditingController summaryTextController = TextEditingController();
+
 
   @override
   void initState() {
@@ -64,6 +75,7 @@ class _IntroductionPage extends State<IntroductionPage> {
       createBirthdayPage(),
       createLocationPage(),
       createPhotoUploadPage(),
+      createSummaryPage(),
     ], controller: _pageController);
 
     return new Scaffold(
@@ -89,7 +101,7 @@ class _IntroductionPage extends State<IntroductionPage> {
         child: Card(
             child: Padding(
                 padding:
-                    EdgeInsets.only(left: 20, right: 20, top: 30, bottom: 30),
+                EdgeInsets.only(left: 20, right: 20, top: 30, bottom: 30),
                 child: Column(
                   children: <Widget>[
                     Text(
@@ -403,7 +415,7 @@ class _IntroductionPage extends State<IntroductionPage> {
       textColor: Colors.white,
       color: Colors.blueAccent,
       onPressed:
-          _birthdayPageBtnActivated ? () => navigateToLandingPage() : null,
+      _birthdayPageBtnActivated ? () => nextPage() : null,
 //          submit();
     );
   }
@@ -449,30 +461,31 @@ class _IntroductionPage extends State<IntroductionPage> {
             padding: EdgeInsets.only(top: 40, bottom: 50),
             child: Card(
                 child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    Constants.AUTOMATIC_LOCATION,
-                    textAlign: TextAlign.center,
-                    textDirection: TextDirection.rtl,
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        Constants.AUTOMATIC_LOCATION,
+                        textAlign: TextAlign.center,
+                        textDirection: TextDirection.rtl,
+                      ),
+                      Padding(padding: EdgeInsets.all(30)),
+                      enableLocationServicesBtn(),
+                      Padding(padding: EdgeInsets.all(5)),
+                      InkWell(
+                        child: Text(
+                          "No Thanks",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                        onTap: () =>
+                            setState(() {
+                              _defaultLocationCard = false;
+                              _locationPageBtnActivated = true;
+                            }),
+                      )
+                    ],
                   ),
-                  Padding(padding: EdgeInsets.all(30)),
-                  enableLocationServicesBtn(),
-                  Padding(padding: EdgeInsets.all(5)),
-                  InkWell(
-                    child: Text(
-                      "No Thanks",
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    onTap: () => setState(() {
-                          _defaultLocationCard = false;
-                          _locationPageBtnActivated = true;
-                        }),
-                  )
-                ],
-              ),
-            )))
+                )))
       ],
     );
   }
@@ -531,22 +544,22 @@ class _IntroductionPage extends State<IntroductionPage> {
   }
 
   initPlatformState() async {
-    Map<String, double> location;
     // Platform messages may fail, so we use a try/catch PlatformException.
 /**/
     try {
       _permission = await _location.hasPermission();
-      location = await _location.getLocation();
+      _currentLocation = await _location.getLocation();
       error = null;
+//      _locationPageBtnActivated = true;
     } on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
         error = 'Permission denied';
       } else if (e.code == 'PERMISSION_DENIED_NEVER_ASK') {
         error =
-            'Permission denied - please ask the user to enable it from the app settings';
+        'Permission denied - please ask the user to enable it from the app settings';
       }
 
-      location = null;
+      _currentLocation = null;
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -555,26 +568,27 @@ class _IntroductionPage extends State<IntroductionPage> {
     //if (!mounted) return;
 
     setState(() {
-      _startLocation = location;
+      _startLocation = _currentLocation;
     });
 
     _locationSubscription =
         _location.onLocationChanged().listen((Map<String, double> result) {
-      setState(() {
-        _locationPageBtnActivated = true;
-        _currentLocation = result;
-      });
-    });
+          setState(() {
+            _locationPageBtnActivated = true;
+            _currentLocation = result;
+          });
+        });
   }
 
 // ------------------------------------------[ Photo Upload Page]------------------------------------------------
-  bool _photoUploadPageBtnAcivatedt = false;
+  bool _photoUploadPageBtnActivated = false;
 
   Widget createPhotoUploadPage() {
     return Padding(
       padding: EdgeInsets.all(20),
       child: Center(
         child: Column(children: <Widget>[
+          Padding(padding: EdgeInsets.only(top: 20)),
           Text(
             Constants.ABOUT_YOU_TEXT,
             textAlign: TextAlign.center,
@@ -587,6 +601,7 @@ class _IntroductionPage extends State<IntroductionPage> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             textDirection: TextDirection.rtl,
           ),
+          Padding(padding: EdgeInsets.only(top: 20)),
           new Expanded(child: buildGridView()),
           /*_imageArr == null
               ? new Text('No image selected.')
@@ -597,7 +612,7 @@ class _IntroductionPage extends State<IntroductionPage> {
             tooltip: 'Pick Image',
             child: new Icon(Icons.add_a_photo),
           ),*/
-          buildRaisedButtonLocationNextPage()
+          buildRaisedButtonPhotoUploadNextPage()
         ]),
       ),
     );
@@ -612,6 +627,7 @@ class _IntroductionPage extends State<IntroductionPage> {
       }
       if (image != null) {
         _imageArr.add(image);
+        _photoUploadPageBtnActivated = true;
       }
     });
   }
@@ -627,10 +643,10 @@ class _IntroductionPage extends State<IntroductionPage> {
           imgOrTextWidget,
           imgOrTextWidget == null
               ? new FloatingActionButton(
-                  onPressed: getImage,
-                  tooltip: 'Pick Image',
-                  child: new Icon(Icons.add_a_photo),
-                )
+            onPressed: getImage,
+            tooltip: 'Pick Image',
+            child: new Icon(Icons.add_a_photo),
+          )
               : null
         ].where(notNull).toList(),
         mainAxisAlignment: MainAxisAlignment.center,
@@ -641,9 +657,10 @@ class _IntroductionPage extends State<IntroductionPage> {
   Image createImgWidget(int imgNum) {
     return _imageArr != null && _imageArr.length > imgNum
         ? new Image.file(
-            _imageArr.elementAt(imgNum),
-            height: 175,
-          )
+      _imageArr.elementAt(imgNum),
+      height: 140,
+      width: 140,
+    )
         : null;
   }
 
@@ -652,7 +669,7 @@ class _IntroductionPage extends State<IntroductionPage> {
         primary: true,
         padding: EdgeInsets.all(1.0),
         crossAxisCount: 2,
-        childAspectRatio: 1.0,
+        childAspectRatio: 1.2,
         mainAxisSpacing: 1.0,
         crossAxisSpacing: 1.0,
         children: <Widget>[
@@ -702,31 +719,149 @@ class _IntroductionPage extends State<IntroductionPage> {
       _imageArr.add(compressImg);
     });
   }
-}
 
-/*class TheGridView {
-  Card makeGridCell(IconData icon) {
-    return Card(
-      elevation: 1.0,
-      child: Center(child: Icon(icon, size: 30.0,)),
+  RaisedButton buildRaisedButtonPhotoUploadNextPage() {
+    return RaisedButton(
+      shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(2.0)),
+      padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
+      child: Text(
+        Constants.NEXT_TEXT,
+        textScaleFactor: 1.5,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      textColor: Colors.white,
+      color: Colors.blueAccent,
+      onPressed: _photoUploadPageBtnActivated ? () => nextPage() : null,
+//          submit();
     );
   }
 
-  GridView build() {
-    return GridView.count(
-        primary: true,
-        padding: EdgeInsets.all(1.0),
-        crossAxisCount: 2,
-        childAspectRatio: 1.0,
-        mainAxisSpacing: 1.0,
-        crossAxisSpacing: 1.0,
-        children: <Widget>[
-          makeGridCell(Icons.add_a_photo),
-          makeGridCell(Icons.add_a_photo),
-          makeGridCell(Icons.add_a_photo),
-          makeGridCell(Icons.add_a_photo),
-          makeGridCell(Icons.add_a_photo),
-          makeGridCell(Icons.add_a_photo),
-        ]);
+  // ------------------------------------------[ Summary Page]------------------------------------------------
+  bool _summaryPageBtnActivated = false;
+
+  Widget createSummaryPage() {
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: Center(
+        child: ListView(children: <Widget>[
+          Text(
+            Constants.ABOUT_YOU_TEXT,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textDirection: TextDirection.rtl,
+          ),
+          Text(
+            Constants.SHORT_SUMMARY,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            textDirection: TextDirection.rtl,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10, bottom: 20),
+            child: TextField(
+                maxLength: 500,
+                maxLines: 5,
+                controller: summaryTextController,
+                textAlign: TextAlign.right,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  hintStyle: TextStyle(),
+                  labelText: Constants.SHORT_SUMMARY_Label,
+                  filled: true,
+                  /*border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(3.0))*/),
+                onChanged: activateFinishBtn),
+          ),
+          /*_imageArr == null
+              ? new Text('No image selected.')
+              : new Image.file(_imageArr.elementAt(0)),
+          Padding(padding: EdgeInsets.only(bottom: 30)),
+          new FloatingActionButton(
+            onPressed: getImage,
+            tooltip: 'Pick Image',
+            child: new Icon(Icons.add_a_photo),
+          ),*/
+          buildRaisedButtonSummaryNextPage()
+        ]),
+      ),
+    );
   }
-}*/
+
+  RaisedButton buildRaisedButtonSummaryNextPage() {
+    return RaisedButton(
+      shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(2.0)),
+      padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 5.0, bottom: 5.0),
+      child: Text(
+        Constants.GET_STARTED_BTN,
+        textScaleFactor: 1.5,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      textColor: Colors.white,
+      color: Colors.blueAccent,
+      onPressed: _summaryPageBtnActivated ? () => saveData() : null,
+//          submit();
+    );
+  }
+
+  void activateFinishBtn(String value) {
+    setState(() {
+      if (value.isNotEmpty && value.length > 1)
+        _summaryPageBtnActivated = true;
+      else
+        _summaryPageBtnActivated = false;
+    });
+  }
+
+  void saveData() {
+    var currentLocation = <String, double>{};
+
+    User user = User();
+    user.firstName = firstNameController.text;
+    user.gender = _genderSelection;
+    user.birthday = new DateTime(_year, _month, _date);
+    user.location = new CustomLocation(
+        _currentLocation["latitude"], _currentLocation["longitude"]);
+    user.summary = summaryTextController.text;
+
+
+    registerUser(user);
+
+//    _date
+//    _month
+//    _year
+
+
+  }
+
+  Future<String> registerUser(User user) async {
+    Uri uri = Uri.http(Constants.SERVER_URL, Constants.REGISTER_USER);
+    String str = json.encode(user);
+    print(str);
+
+    http.Response response = await http.post(
+        uri,
+        body: json.encode(user.toJson()),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+    );
+
+    if (response.statusCode == 201) {
+      // registration accepted: go to next
+      navigateToPage(IntroductionPage());
+    } else {
+      // user already exists: go to sign in page
+      print(response.statusCode);
+//      navigateToPage(LoginPage());
+    }
+  }
+
+
+  void navigateToPage(Widget page) async {
+    bool result = await Navigator.push(
+        _context, MaterialPageRoute(builder: (context) => page));
+  }
+}

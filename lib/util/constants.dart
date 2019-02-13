@@ -1,10 +1,15 @@
 class Constants{
   // Server endpoints
-//  static final String SERVER_IP = "10.0.2.2";
-  static final String SERVER_IP = "hamrah.herokuapp.com";
+//  static final String SERVER_IP = "hamrah.herokuapp.com";
   static final int    SERVER_PORT = 8091;
-  static final String SERVER_URL = SERVER_IP /*+ ":" + SERVER_PORT.toString()*/;
+//  static final String SERVER_URL = SERVER_IP;
   static final String REGISTER_USER = "/user";
+  static final String IMAGE_UPLOAD = "/user/image";
+
+  // Development
+  static final String SERVER_IP = "10.0.2.2";
+  static final String GET_ALL_USERS = "/user/all";
+  static final String SERVER_URL = SERVER_IP + ":" + SERVER_PORT.toString();
 
 
   static final String APP_NAME_ENGLISH = "Hamrah";
@@ -37,13 +42,16 @@ class Constants{
   static final String AUTOMATIC_LOCATION = "موقعیت مکانی خودت رو به صورت خودکار پر کن";
   static final String ACTIVATE = "فعال کن";
   static final String ADD_SOME_GREAT_PHOTOS = "چند تا عکس عالی اضافه کن";
+  static final String SHORT_SUMMARY = "خودت رو به طور خلاصه معرفی کن";
+  static final String SHORT_SUMMARY_Label = "برای مثال، بهترین دوستت چه طور توصیفت می کنه؟";
 
 
 
 
 
-  // Development
-  static final String GET_ALL_USERS = "/user/all";
+
+
+
 
 
 
